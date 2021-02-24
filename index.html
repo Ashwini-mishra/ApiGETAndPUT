@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+    <title>CRUD API</title>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<style>
+    body
+    {
+        background-image: url("body.jpg");
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        padding: 30px;
+    }
+    .container{
+        padding: 10px;
+        width: 70%;
+        margin: 0px auto;
+        background-image: url('./banner.jpg');
+        background-size: 100%;
+        background-repeat:no-repeat ;
+    }
+    label{
+        padding: 20px;
+        margin: 20px;
+    }
+    table{
+        padding: 5px;
+        border:1px solid black;
+        border-collapse: collapse;
+        text-align: center;
+        width: 100%;
+        padding: 10px;
+    }
+    tr, td, th{
+        padding: 5px;
+        border:1px solid black;
+        border-collapse: collapse;
+        text-align: center;
+        width: 800px;
+        padding: 10px;
+        color: red;
+        font-size: 22px;
+    }
+    .btn
+    {
+        width:200px;
+        margin: 20px;
+        
+    }
+    input{
+        margin-left:5px;
+        width:70px;
+        padding: 5px;
+    }
+    .input_post_form
+    {
+        width:300px;
+        padding: 5px;
+        
+    }
+    form{
+        padding: 20px;
+        text-align: center;
+        color: brown;
+    }
+</style>
+<body>
+    <h1 style="text-align: center;">Welcome to admin panel </h1>
+    <input type="button" value="Create New" class="btn" onclick="create_data()" style="background-color: green;">
+    <div id="body" class="container"></div>
+</body>
+
+<script>
+
+let result="";
+ let pro=fetch("http://192.168.1.10/api/users/" ,{ method: 'GET'})
+ 
+ .then((response) => response.json())
+ .then((data) => showData(data))
+ .catch(function (err) {
+    console.log(err);
+  });
+ 
+function show_data(id)
+{
+    let key=result[id].id;
+    // alert(key)
+    fetch('http://192.168.1.10/api/users/'+key  ,{ method: 'GET'})
+    .then((response) => response.json())
+    .then((data) => form_show(data))
+    .catch(function (err) {
+        console.log(err);
+    });
+ 
+}
+
+
+//  console.log(pro);
+function showData(data)
+{
+    // body.innerHTML="";
+    // console.log(data.result);
+    result= data.result;
+    let variable="<table><tr><th>Srl.no.</th><th>Name</th><th>Options</th></tr>";
+
+   for( let i =0; i<result.length ; i++)
+   {
+        variable += "<tr><td>"+i+"</td><td>"+result[i].name+"</td>";
+        variable += "<td><a href='#' target='_blank'><input type='button' value='View' onclick=view("+i+")></a><a href='#' target='_blank'><input type='button' value='Edit' onclick=show_data("+i+")></a><a href='#' target='_blank'><input type='button' value='Delete' onclick=erase("+i+")></a></td></tr>";
+   }
+    variable+="</table>";
+    document.getElementById("body").innerHTML=variable;
+}
+
+function view(id)
+{
+    let key=id;
+
+//     alert("View"+id);
+    let pro=fetch('http://192.168.1.10/api/users/'+key ,{ method: 'GET'})
+
+    .then((response) => response.json())
+    .then((data) => {
+
+        let i=id;
+        let variable="<table><tr><th>Srl.no.</th><th>Details</th></tr>";
+            variable += "<tr><td>ID: </td><td>"+result[i].id+"</td>";
+            variable += "<tr><td>Name :</td><td>"+result[i].name+"</td>";
+            variable += "<tr><td>Email</td><td>"+result[i].email+"</td>";
+            variable += "<tr><td>Address</td><td>"+result[i].address+"</td>";
+            variable += "<tr><td>Phone</td><td>"+result[i].phone+"</td>";
+            variable += "<tr><td>Gender</td><td>"+result[i].gender+"</td>";
+            variable += "<tr><td>Country</td><td>"+result[i].country+"</td>";
+            variable += "<tr><td>State</td><td>"+result[i].state+"</td>";
+            variable += "<tr><td>Created At </td><td>"+result[i].created_at+"</td>";
+            variable += "<tr><td>Updated At</td><td>"+result[i].updated_at+"</td>";
+            variable+="</table>";
+    
+            document.getElementById("body").innerHTML=variable;
+    } )
+    .catch(function (err) {
+        console.log(err);
+    });
+}  
+
+// DELETE method
+
+function erase(id)
+    {
+        alert("Delete"+id);
+        let key=result[id].id;
+
+        fetch('http://192.168.1.10:80/api/user/delete/'+key,{ method: 'DELETE'})
+        .then((response) => response.json())
+        .then((data) =>  console.log(data))
+        .catch(function (err) {
+            console.log(err);
+        });
+    }
+
+// PUT Method
+
+function form_show(id)
+{
+    let value=id.data[0];
+    let i=id.data[0].id;
+    // console.log(value);
+    let form="";
+    
+            form +=" <form id='form_table'>";
+            form +="<label for=''>Name &nbsp;&nbsp;&nbsp;&nbsp;</label>";
+            form +="<input type='text' name='name' id='name' value="+value.name+" class='input_post_form' placeholder='' ><br><br>";
+
+            form +="<label for=''>Email Id </label>";
+            form +="<input type='text' name='email' id='email' value="+value.email+" class='input_post_form' placeholder=''><br><br>";
+
+            form +="<label for=''>Address&nbsp;</label>";
+            form +="<input type='text' name='address' id='address' value="+value.address+" class='input_post_form'><br><br>";
+
+            form +="<label for=''>Phone &nbsp;&nbsp;&nbsp;</label>";
+            form +="<input type='text' name='phone' id='phone' value="+value.phone+" class='input_post_form'><br><br>";
+
+            form +="<label for=''>Gender&nbsp;&nbsp;</label>";
+            form +="<input type='text' name='gender' id='gender' value="+value.gender+" class='input_post_form'><br><br>";
+
+            form +="<label for=''>Country&nbsp;</label>";
+            form +="<input type='text' name='country' id='country' value="+value.country+" class='input_post_form'><br><br>";
+
+            form +="<label for=''>state  &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;</label>";
+            form +="<input type='text' name='state' id='state' value="+value.state+" class='input_post_form'><br><br>";
+            form +="<input type='submit' name='name' id='' value='submit'>"
+            form +="</form>";
+            
+            document.getElementById("body").innerHTML=form;
+        form_table.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            let name=document.getElementById("name").value;
+            let email=document.getElementById("email").value;
+            let address=document.getElementById("address").value;
+            let phone=document.getElementById("phone").value;
+            let gender=document.getElementById("gender").value;
+            let country=document.getElementById("country").value;
+            let state=document.getElementById("state").value;
+
+            // alert(name);
+
+            let response = await fetch('http://192.168.1.10:80/api/user/update/'+i,{ method: 'PUT' ,  body: JSON.stringify({ 
+            "name":name,
+            "email":email,
+            "address" : address,
+            "phone":phone,
+            "gender":gender,
+            "country" :country,
+            "state": state
+        }),
+            headers: { 
+                "Content-type": "application/json;"
+            } })
+
+            let result = await response.json();
+
+            alert(result.message);
+        };
+
+}
+
+// Post MEthod
+
+function create_data()
+{
+    // let value=id.data[0];
+    // let i=id.data[0].id;
+    // console.log(value);
+    let form="";
+    
+        form +=" <form id='form_table'>";
+        form +="<label for=''>Name &nbsp;&nbsp;&nbsp;&nbsp;</label>";
+        form +="<input type='text' name='name' id='name' class='input_post_form' placeholder='' ><br><br>";
+
+        form +="<label for=''>Email Id </label>";
+        form +="<input type='text' name='email' id='' class='input_post_form' placeholder=''><br><br>";
+
+        form +="<label for=''>Address&nbsp;</label>";
+        form +="<input type='text' name='address' id='' class='input_post_form'><br><br>";
+
+        form +="<label for=''>Phone &nbsp;&nbsp;&nbsp;</label>";
+        form +="<input type='text' name='phone' id='' class='input_post_form'><br><br>";
+
+        form +="<label for=''>Gender&nbsp;&nbsp;</label>";
+        form +="<input type='text' name='gender' id=''  class='input_post_form'><br><br>";
+
+        form +="<label for=''>Country&nbsp;</label>";
+        form +="<input type='text' name='country' id=''  class='input_post_form'><br><br>";
+
+        form +="<label for=''>state &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>";
+        form +="<input type='text' name='state' id='' class='input_post_form'><br><br>";
+        form +="<input type='submit' name='name' id='' value='submit'>"
+        form +="</form>";
+        
+        document.getElementById("body").innerHTML=form;
+
+
+        form_table.onsubmit = async (e) => {
+            e.preventDefault();
+
+            let response = await fetch(' http://192.168.1.10:80/api/auth/register', {
+            method: 'POST',
+            body: new FormData(form_table)
+            });
+
+            let result = await response.json();
+
+            alert(result.message);
+        };
+}
+
+    // Static PUT Method
+    
+    // function edit(id)
+    // {
+    //      alert(id);
+
+        // let key=result[id].id;
+        // alert(key)
+        // let pro=fetch('http://192.168.1.10:80/api/user/update/'+key,{ method: 'PUT' ,  body: JSON.stringify({ 
+        //     "name":"rahul",
+        //     "email":"rahul@keymouseit.com",
+        //     "password":"rahaull123",
+        //     "address" : "Cshandigarh",
+        //     "phone":"123654789",
+        //     "gender":"male",
+        //     "country" : "India",
+        //     "state": "uttrakhand"
+        // }),
+        //  headers: { 
+        //     "Content-type": "application/json; charset=UTF-8"
+        // } })
+
+        // .then((response) => response.json())
+        // .then((data) =>  console.log(data))
+        // .catch(function (err) {
+        //     console.log(err);
+        // });
+
+    // alert(response);    
+// }
+
+
+// Static POST method
+
+    // function add_more()
+    // {
+    //     fetch('http://192.168.1.10:80/api/auth/register',{ method: 'POST', body: JSON.stringify({ 
+    //         "name":"rahul",
+    //         "email":"rahul@gmail.com",
+    //         "password":"12s345",
+    //         "address" : "Cshandigarh",
+    //         "phone":"123654789",
+    //         "gender":"male",
+    //         "country" : "India",
+    //         "state": "Uttrakhand"
+    // }), 
+    //     headers: { 
+    //     "Content-type": "application/json; charset=UTF-8"
+    // } })
+    //     .then((response) => response.json())
+    //     .then((data) =>  console.log(data))
+    //     .catch(function (err) {
+    //         console.log(err);
+    //     });
+    // }
+
+//  
+</script>
+</html>
