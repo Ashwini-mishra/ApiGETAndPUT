@@ -21,6 +21,7 @@
         background-image: url('./banner.jpg');
         background-size: 100%;
         background-repeat:no-repeat ;
+        box-shadow: 0px 0px 10px 8px black;
     }
     label{
         padding: 20px;
@@ -36,7 +37,7 @@
     }
     tr, td, th{
         padding: 5px;
-        border:1px solid black;
+        border:1px solid white;
         border-collapse: collapse;
         text-align: center;
         width: 800px;
@@ -66,10 +67,23 @@
         text-align: center;
         color: brown;
     }
+    .color_table_d{
+        box-shadow: 0px 0px 4px 2px red;
+
+    }
+    .color_table_e{
+        box-shadow: 0px 0px 4px 2px yellow;
+
+    }
+    .color_table{
+        box-shadow: 0px 0px 4px 2px green;
+
+    }
 </style>
 <body>
     <h1 style="text-align: center;">Welcome to admin panel </h1>
-    <input type="button" value="Create New" class="btn" onclick="create_data()" style="background-color: green;">
+    <input type="button" value="Home" class="btn" onclick="block_data()" id="home" style="background-color: green;box-shadow: 0px 0px 5px 3px black;">
+    <input type="button" value="Create New" class="btn" onclick="create_data()" id="create" style="background-color: green;box-shadow: 0px 0px 5px 3px black;">
     <div id="body" class="container"></div>
 </body>
 
@@ -83,7 +97,21 @@ let result="";
  .catch(function (err) {
     console.log(err);
   });
- 
+  
+  document.getElementById("home").style.display="none";
+
+function block_data()
+{
+    document.getElementById("home").style.display="none";
+    document.getElementById("create").style.display="block";
+    location.reload();
+}
+function block_disp()
+{
+    document.getElementById("home").style.display="block";
+    document.getElementById("create").style.display="none";
+}
+
 function show_data(id)
 {
     let key=result[id].id;
@@ -109,7 +137,7 @@ function showData(data)
    for( let i =0; i<result.length ; i++)
    {
         variable += "<tr><td>"+i+"</td><td>"+result[i].name+"</td>";
-        variable += "<td><a href='#' target='_blank'><input type='button' value='View' onclick=view("+i+")></a><a href='#' target='_blank'><input type='button' value='Edit' onclick=show_data("+i+")></a><a href='#' target='_blank'><input type='button' value='Delete' onclick=erase("+i+")></a></td></tr>";
+        variable += "<td><a href='#'><input type='button' value='View' onclick=view("+i+") class='color_table'></a><a href='#'><input type='button' value='Edit' onclick=show_data("+i+") class='color_table_e'></a><a href='#'><input type='button' value='Delete' onclick=erase("+i+") class='color_table_d'></a></td></tr>";
    }
     variable+="</table>";
     document.getElementById("body").innerHTML=variable;
@@ -117,6 +145,7 @@ function showData(data)
 
 function view(id)
 {
+    block_disp();
     let key=id;
 
 //     alert("View"+id);
@@ -150,7 +179,7 @@ function view(id)
 
 function erase(id)
     {
-        alert("Delete"+id);
+        alert("Deleted");
         let key=result[id].id;
 
         fetch('http://192.168.1.10:80/api/user/delete/'+key,{ method: 'DELETE'})
@@ -165,14 +194,16 @@ function erase(id)
 
 function form_show(id)
 {
+    block_disp();
+
     let value=id.data[0];
     let i=id.data[0].id;
-    // console.log(value);
+    // console.log(value.name);
     let form="";
     
             form +=" <form id='form_table'>";
             form +="<label for=''>Name &nbsp;&nbsp;&nbsp;&nbsp;</label>";
-            form +="<input type='text' name='name' id='name' value="+value.name+" class='input_post_form' placeholder='' ><br><br>";
+            form +=`<input type='text' name='name' id='name' value="${value.name}" class='input_post_form' placeholder='' ><br><br>`;
 
             form +="<label for=''>Email Id </label>";
             form +="<input type='text' name='email' id='email' value="+value.email+" class='input_post_form' placeholder=''><br><br>";
@@ -195,6 +226,7 @@ function form_show(id)
             form +="</form>";
             
             document.getElementById("body").innerHTML=form;
+
         form_table.onsubmit = async (e) => {
             e.preventDefault();
             
@@ -224,16 +256,16 @@ function form_show(id)
             let result = await response.json();
 
             alert(result.message);
+            location.reload();
         };
-
+       
 }
 
 // Post MEthod
 
 function create_data()
 {
-    // let value=id.data[0];
-    // let i=id.data[0].id;
+    block_disp();
     // console.log(value);
     let form="";
     
@@ -266,7 +298,7 @@ function create_data()
 
         form_table.onsubmit = async (e) => {
             e.preventDefault();
-
+           
             let response = await fetch(' http://192.168.1.10:80/api/auth/register', {
             method: 'POST',
             body: new FormData(form_table)
@@ -275,7 +307,9 @@ function create_data()
             let result = await response.json();
 
             alert(result.message);
+            location.reload();
         };
+       
 }
 
     // Static PUT Method
